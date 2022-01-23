@@ -66,8 +66,8 @@
   input, textarea {
     color: white;
     background: #222;
-    border-radius: 2px;
-    border: 4px solid #333;
+    border-radius: 4px;
+    border: 2px solid #333;
   }
   .wrapper {
     width: 80%;

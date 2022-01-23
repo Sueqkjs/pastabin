@@ -85,7 +85,8 @@
   #pasta {
     width: 80%;
     #code {
-      background: #666;
+      background: #111;
+      font-weight: lighter;
       font-family: 'Courier New', Courier, monospace;
       width: 100%;
       overflow: scroll;
