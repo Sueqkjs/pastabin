@@ -74,15 +74,14 @@
 <style lang="scss">
   input,
   #code {
+    color: white;
     background: #222;
-    color: rgb(223, 223, 223);
     border: 2px solid #333;
     border-radius: 4px;
   }
   #pasta {
     width: 80%;
     #code {
-      color: rgb(223, 223, 223);
       background: #111;
       font-weight: lighter;
       font-family: "Courier New", Courier, monospace;

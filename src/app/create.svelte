@@ -10,7 +10,7 @@
     _ = root.querySelector.bind(root);
   };
   const contentChange = () => {
-    const content = _(".wrapper content");
+    const content = _(".wrapper #content");
     let maxC = Math.max(...content.value.split("\n").map((x) => x.length));
     let maxL = content.value.split("\n").length;
     content.rows = maxL;
@@ -51,7 +51,7 @@
   <h1>Boil the pasta</h1>
   <input id="title" placeholder="Title" /> <br />
   <div class="wrapper">
-    <textarea on:change={contentChange} id="content" placeholder="Content" />
+    <textarea on:input={contentChange} id="content" placeholder="Content" />
     <br />
   </div>
   <input id="submit" on:click={post} type="button" value="Boil" />
