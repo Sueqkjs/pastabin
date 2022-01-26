@@ -3,7 +3,8 @@
 ## これはなに
 SvelteとTypeScriptとRustで作ったゴミ <br>
 ウンコード & 命名がカス <br>
-Svelteを理解しきってないけどscssとかts直で書けたりしたの感動した
+~~Svelteを理解しきってないけどscssとかts直で書けたりしたの感動した~~
+Svelteのコンポーネント、素晴らしくない?
 
 ## ビルドとかに必要なもの
 - Cargo
