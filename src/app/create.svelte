@@ -6,12 +6,12 @@
 
   let root;
   let _;
-  window.onload = (async() => {
+  window.onload = async () => {
     _ = root.querySelector.bind(root);
-  });
+  };
   const contentChange = () => {
     const content = _(".wrapper content");
-    let maxC = Math.max(...content.value.split("\n").map(x => x.length));
+    let maxC = Math.max(...content.value.split("\n").map((x) => x.length));
     let maxL = content.value.split("\n").length;
     content.rows = maxL;
     content.cols = maxC;
@@ -22,17 +22,20 @@
     let submit = _("#submit");
     let wrapper = _(".wrapper");
     let r = _("#result");
-    let res = await (await fetch("api/pasta", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        title: title.value,
-        content: content.value,
-        editPasswordHash: Array.from(await randomBytesWeb(32)).map(x => x.toString(16)).join("")
+    let res = await (
+      await fetch("api/pasta", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title.value,
+          content: content.value,
+        }),
       })
-    })).json().catch(console.error);
+    )
+      .json()
+      .catch(console.error);
     if (!res || res.message) alert("Error: " + res?.message ?? "");
     resultId = res.id;
     resultKey = res.key;
@@ -46,16 +49,25 @@
 
 <main bind:this={root}>
   <h1>Boil the pasta</h1>
-  <input id="title" placeholder="Title"> <br>
+  <input id="title" placeholder="Title" /> <br />
   <div class="wrapper">
-    <textarea on:change={contentChange} id="content" placeholder="Content"></textarea> <br>
+    <textarea on:change={contentChange} id="content" placeholder="Content" />
+    <br />
   </div>
-  <input id="submit" on:click={post} type="button" value="Boil">
+  <input id="submit" on:click={post} type="button" value="Boil" />
   <div id="result">
-    <p>Id: </p> <input readonly class="result" value="{resultId}">
-    <p>Key: </p> <input readonly class="result" value="{resultKey}">
-    <p>Nonce: </p> <input readonly class="result" value="{resultNonce}">
-    <p>Url(UnSecure): </p> <input readonly class="result" value="{location.origin}/pasta/{resultId}?iv={resultNonce}&k={resultKey}">
+    <p>Id:</p>
+    <input readonly class="result" value={resultId} />
+    <p>Key:</p>
+    <input readonly class="result" value={resultKey} />
+    <p>Nonce:</p>
+    <input readonly class="result" value={resultNonce} />
+    <p>Url(UnSecure):</p>
+    <input
+      readonly
+      class="result"
+      value="{location.origin}/pasta/{resultId}?iv={resultNonce}&k={resultKey}"
+    />
   </div>
 </main>
 
@@ -63,7 +75,8 @@
   #result {
     display: none;
   }
-  input, textarea {
+  input,
+  textarea {
     color: white;
     background: #222;
     border-radius: 4px;

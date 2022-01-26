@@ -8,12 +8,12 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/index.html", async (_, res) => {
-  res.end((await html()).serialize());
+  res.end(html);
 });
 
-router.get("/pasta/:id", async (_, res) => res.end((await html()).serialize()));
+router.get("/pasta/:id", async (_, res) => res.end(html));
 
-router.get("/create", async(_, res) => res.end((await html()).serialize()));
+router.get("/create", async (_, res) => res.end(html));
 
 export default router;
 export const path = "/";

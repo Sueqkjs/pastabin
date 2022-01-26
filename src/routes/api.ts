@@ -11,7 +11,7 @@ router.get("/", async (_, res) => {
 });
 
 router.get("/pasta/:id", async (req, res) => {
-  const pasta = pastas.find((x) => x.id === req.params.id);
+  const pasta = global.pastas.find((x) => x.id === req.params.id);
   if (!pasta) return res.status(404).json({ message: "not found" });
   const { content, title, uploadedTimestamp } = pasta;
   res.status(200).json({ content, title, uploadedTimestamp });
@@ -19,33 +19,29 @@ router.get("/pasta/:id", async (req, res) => {
 
 router.post("/pasta", async (req, res) => {
   if (!req.body) return res.status(400).json({ message: "body is required" });
-  // @ts-ignore
   const {
     title,
     content,
-    editPasswordHash,
     showPasswordHash,
     hiddenTimestamp,
   }: {
     title: string;
     content: string;
-    editPasswordHash: string;
     showPasswordHash?: string;
     hiddenTimestamp: number;
   } = req.body;
   const encrypted = await aes.encrypt(content);
   const id = (await uniqueId()).toString();
-  if (typeof content !== "string" || typeof editPasswordHash !== "string")
+  if (typeof content !== "string" || !title?.length)
     return res.status(400).json({ message: "incorrect type" });
   const pasta = {
     title,
     id,
     content: encrypted.cipherText,
-    editPasswordHash,
     showPasswordHash: showPasswordHash ?? "",
     uploadedTimestamp: hiddenTimestamp ? 0 : Date.now(),
   };
-  pastas.push(pasta);
+  global.pastas.push(pasta);
   res.json({ id, key: encrypted.key, nonce: encrypted.nonce });
 });
 

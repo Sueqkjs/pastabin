@@ -1,5 +1,5 @@
 <main>
-  <h1>Welcome to PastaBin</h1>
+  <h1>PastaBin</h1>
 </main>
 
 <style lang="scss">
@@ -11,8 +11,10 @@
     background: $backgroundColor;
   }
   main {
-    text-align: center;
-    padding: 1em;
-    margin: 0 auto;
+    h1 {
+      text-align: center;
+      padding: 1em;
+      margin: 0 auto;
+    }
   }
 </style>

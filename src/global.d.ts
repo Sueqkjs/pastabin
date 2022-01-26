@@ -3,6 +3,5 @@ declare var pastas: Array<{
   id: string;
   content: string;
   uploadedTimestamp: number;
-  editPasswordHash: string;
   showPasswordHash?: string;
 }>;
