@@ -8,14 +8,14 @@
   let _;
   window.onload = (async() => {
     _ = root.querySelector.bind(root);
-    let content = _(".wrapper #content");
-    content.addEventListener("input", () => {
-      let maxC = Math.max(...content.value.split("\n").map(x => x.length));
-      let maxL = content.value.split("\n").length;
-      content.rows = maxL;
-      content.cols = maxC;
-    })
   });
+  const contentChange = () => {
+    const content = _(".wrapper content");
+    let maxC = Math.max(...content.value.split("\n").map(x => x.length));
+    let maxL = content.value.split("\n").length;
+    content.rows = maxL;
+    content.cols = maxC;
+  };
   async function post() {
     let title = _("#title");
     let content = _(".wrapper #content");
@@ -48,7 +48,7 @@
   <h1>Boil the pasta</h1>
   <input id="title" placeholder="Title"> <br>
   <div class="wrapper">
-    <textarea id="content" placeholder="Content"></textarea> <br>
+    <textarea on:change={contentChange} id="content" placeholder="Content"></textarea> <br>
   </div>
   <input id="submit" on:click={post} type="button" value="Boil">
   <div id="result">

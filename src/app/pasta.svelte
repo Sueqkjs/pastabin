@@ -10,7 +10,6 @@
     const key = params.get("k");
     const nonce = params.get("iv");
     const id = location.pathname.slice(1).split("/")[1];
-    // @ts-ignore
     const res = await (await fetch("/api/pasta/" + id)).json().catch(console.error);
     if (!res) return alert("Something went wrong. " + res?.message ?? "");
     content = escapeHTML(res.content);
@@ -22,12 +21,6 @@
       await decrypt();
     }
   });
-
-  interface IPasta {
-    title: string
-    content: string,
-    uploadedTimestamp: number
-  }
 
   async function decrypt() {
     const key = root.querySelector("#key").value;

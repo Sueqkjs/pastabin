@@ -13,8 +13,6 @@ export default async function () {
         <title>PastaBin</title>
       </head>
       <body>
-        <div class="navigator"></div>
-        <main></main>
         <script src="/app.js"></script>
       </body>
     </html>`
