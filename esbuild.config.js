@@ -7,26 +7,6 @@ import path from "node:path";
 
 const { sass, typescript } = _preprocess;
 const __dirname = path.dirname(import.meta.url).replace(/^file:\/\//, "");
-const jsdomPatch = {
-  name: "jsdomPatch",
-  setup(build) {
-    build.onLoad(
-      { filter: /jsdom\/living\/xhr\/XMLHttpRequest-impl\.js$/ },
-      async (args) => {
-        let contents = await fs.readFile(args.path, "utf-8");
-        contents = contents.replace(
-          'const syncWorkerFile = require.resolve ? require.resolve("./xhr-sync-worker.js") : null;',
-          `const syncWorkerFile = "${path.join(
-            __dirname,
-            "node_modules",
-            "jsdom/lib/jsdom/living/xhr-sync-worker.js"
-          )}";`
-        );
-        return { contents, loader: "js" };
-      }
-    );
-  },
-};
 
 await fs
   .readdir("src/routes")
@@ -72,7 +52,6 @@ await esbuild
     platform: "node",
     target: "node17",
     format: "cjs",
-    plugins: [jsdomPatch],
   })
   .catch(console.error);
 

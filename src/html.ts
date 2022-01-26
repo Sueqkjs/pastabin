@@ -1,5 +1,3 @@
-import { JSDOM } from "jsdom";
-
 export default `<!doctype html>
     <html>
       <head>
