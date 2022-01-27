@@ -1,3 +1,16 @@
+<script lang="ts">
+  import Index from "./Index.svelte";
+  import Create from "./Create.svelte";
+
+  async function move(component, title: string, href: string) {
+    document.body.removeChild(document.querySelector("main"));
+    new component({
+      target: document.body,
+    });
+    history.pushState(null, title, href);
+  }
+</script>
+
 <div class="navigator">
   <ul>
     <li>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import randomBytesWeb from "../utils/randomBytesWeb";
   $: resultKey = "";
   $: resultNonce = "";
   $: resultId = "";

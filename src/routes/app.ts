@@ -3,17 +3,15 @@ import html from "../html";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/", async (_, res) => {
   res.redirect("/index.html");
 });
 
-router.get("/index.html", async (_, res) => {
-  res.end(html);
+["index", "pasta/:id", "status/:code", "create"].forEach((v) => {
+  router.get(`/${v}(.html)?`, async (_, res) => {
+    res.end(html);
+  });
 });
-
-router.get("/pasta/:id", async (_, res) => res.end(html));
-
-router.get("/create", async (_, res) => res.end(html));
 
 export default router;
 export const path = "/";

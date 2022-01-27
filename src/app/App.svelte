@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Create from "./create.svelte";
-  import Status from "./error.svelte";
-  import Index from "./index.svelte";
-  import Navigator from "./navigator.svelte";
-  import Pasta from "./pasta.svelte";
+  import Create from "./Create.svelte";
+  import Status from "./Status.svelte";
+  import Index from "./Index.svelte";
+  import Navigator from "./Navigator.svelte";
+  import Pasta from "./Pasta.svelte";
   const path = location.pathname.slice(1).split("/");
-  let Page;
+  let Page = Index;
 
   switch (path[0]) {
     case "index.html":
