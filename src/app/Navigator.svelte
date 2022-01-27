@@ -1,56 +1,23 @@
 <script lang="ts">
-  import Index from "./Index.svelte";
-  import Create from "./Create.svelte";
-
-  async function move(component, title: string, href: string) {
-    document.body.removeChild(document.querySelector("main"));
-    new component({
-      target: document.body,
-    });
-    history.pushState(null, title, href);
-  }
+  import NaviButton from "./NaviButton.svelte";
 </script>
 
 <div class="navigator">
   <ul>
-    <li>
-      <a href="/">
-        <ion-icon name="home" />
-      </a>
-    </li>
-    <li>
-      <a href="/create">
-        <ion-icon name="add" />
-      </a>
-    </li>
-    <li>
-      <a href="https://github.com/Sueqkjs/pastabin">
-        <ion-icon name="logo-github" />
-      </a>
-    </li>
+    <NaviButton name="home" href="/" />
+    <NaviButton name="add" href="/create" />
+    <NaviButton name="logo-github" href="https://github.com/Sueqkjs/pastabin" />
   </ul>
 </div>
 
 <style lang="scss">
   .navigator {
-    a {
-      color: white;
-    }
-    border-bottom: solid;
     ul {
       padding-left: 0;
       text-align: center;
       width: 100%;
       list-style: none;
-      li {
-        display: inline-block;
-        font-size: 2em;
-        width: 30%;
-        :hover {
-          opacity: 50%;
-          transition: 0.5s;
-        }
-      }
     }
+    border-bottom: solid;
   }
 </style>
