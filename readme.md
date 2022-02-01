@@ -9,7 +9,7 @@ Svelteのコンポーネント、素晴らしくない?
 - Cargo
 - Rustup (wasm32-unknown-unknownターゲットの追加)
 - wasm-pack
-- GoLang? (esbuildがgolangで書かれてるけど必要かどうかはわからん、まあ入れといた方がいいかな?)
+- ~~GoLang? (esbuildがgolangで書かれてるけど必要かどうかはわからん、まあ入れといた方がいいかな?)~~
 - Nodejs
 - スマートな脳
 - エラー文を読む力
