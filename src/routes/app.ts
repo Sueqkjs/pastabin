@@ -7,7 +7,7 @@ router.get("/", async (_, res) => {
   res.redirect("/index.html");
 });
 
-["index", "pasta/:id", "status/:code", "create"].forEach((v) => {
+["index", "pasta/*", "status/:code", "create"].forEach((v) => {
   router.get(`/${v}(.html)?`, async (_, res) => {
     res.end(html);
   });

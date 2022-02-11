@@ -30,10 +30,10 @@ router.post("/pasta", async (req, res) => {
     showPasswordHash?: string;
     hiddenTimestamp: number;
   } = req.body;
-  const encrypted = await aes.encrypt(content);
   const id = (await uniqueId()).toString();
   if (typeof content !== "string" || !title?.length)
     return res.status(400).json({ message: "incorrect type" });
+  const encrypted = await aes.encrypt(content);
   const pasta = {
     title,
     id,
