@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as aes from "../wasm/web";
+  import * as aes from "../../../lib/crypto/index";
   import hljs from "highlight.js";
   let root;
   $: content = "Loading...";

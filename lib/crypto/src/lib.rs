@@ -1,4 +1,4 @@
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
 use js_sys::*;
 use console_error_panic_hook;
 use aes_gcm::{Aes256Gcm, aead::{Aead, NewAead, generic_array::GenericArray}};
