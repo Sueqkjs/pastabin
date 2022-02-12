@@ -40,30 +40,28 @@ pub async fn status() -> impl Responder {
 }
 
 #[get("/static/{filename:.*}")]
-pub async fn statics(req: HttpRequest) -> Result<NamedFile> {
+pub async fn statics(req: HttpRequest) -> Result<HttpResponse> {
   let path = req.match_info().query("filename");
   let mut ext_vec = path.split(".").collect::<Vec<&str>>();
   ext_vec.remove(0);
   let ext: &str = &ext_vec.join(".");
-  let mut content_type = TEXT_PLAIN;
-  let mut encoding = ContentEncoding::Br;
+  let mut content_type = "text/plain;";
+  let mut encoding = "identify";
   if ext == "jgz" {
-    content_type = APPLICATION_JAVASCRIPT;
-    encoding = ContentEncoding::Gzip;
+    content_type = "application/javascript";
+    encoding = "gzip";
   } else if ext == "cgz" {
-    content_type = TEXT_CSS;
-    encoding = ContentEncoding::Gzip;
+    content_type = "text/css";
+    encoding = "gzip";
   } else if ext == "js" {
-    content_type = APPLICATION_JAVASCRIPT;
+    content_type = "application/javascript";
   } else if ext == "css" {
-    content_type = TEXT_CSS;
+    content_type = "text/css";
   } else if ext == "wasm" {
-    content_type = "application/wasm".parse::<Mime>().unwrap();
+    content_type = "application/wasm";
   }
   println!("{:?}", encoding);
-  Ok(
-    NamedFile::open(format!("./static/{}", path).parse::<std::path::PathBuf>()?)?
-      .set_content_type(content_type)
-      .set_content_encoding(encoding),
-  )
+  let mut file = NamedFile::open(format!("./static/{}", path).parse::<std::path::PathBuf>()?)?
+  .respond_to(&req).await?;
+  Ok(HttpResponse::Ok().header("Content-type", content_type).header("Content-encoding", encoding).streaming(file.take_body()))
 }
