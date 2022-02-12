@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 const fs = require("fs/promises");
+const { existsSync } = require("fs");
 const { join } = require("path");
 const { execSync } = require("child_process");
 const args = process.argv.slice(2);
 const stdio = [ "ignore", process.stdout, process.stderr ];
+
+if (existsSync(join(__dirname, "pastabin"))) fs.unlink(join(__dirname, "pastabin"));
 
 execSync("wasm-pack build -t web", {
   cwd: join(__dirname, "lib", "crypto"),
@@ -42,4 +45,4 @@ fs.copyFile(
 fs.copyFile(
   join(__dirname, "target", args.includes("--release") ? "release" : "debug", "pastabin"),
   join(__dirname, "pastabin")
-)
+);

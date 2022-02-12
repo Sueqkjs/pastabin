@@ -6,16 +6,26 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = "4.0.0-rc.1"
-serde = "1.0.136"
 dotenv = "0.15.0"
-actix-files = "0.6.0-beta.16"
+actix-files = "0.5"
 actix-service = "2.0.2"
 mime = "0.3.16"
+actix = "0.10"
+actix-web = "3.3.3"
+actix-redis = "0.9"
+redis-async = "0.6.3"
+actix-http = "2.2.2"
+hex = "0.4.3"
+chrono = "0.4.19"
 
 [dependencies.tokio]
 version = "1.16.1"
 features = [ "full" ]
 
+[dependencies.serde]
+version = "1.0.136"
+features = [ "derive" ]
+
 [dependencies.crypto]
 path = "./lib/crypto"
+version = "0.1.0"
