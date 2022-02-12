@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+const fs = require("fs/promises");
+const { join } = require("path");
+const { execSync } = require("child_process");
+const args = process.argv.slice(2);
+const stdio = [ "ignore", process.stdout, process.stderr ];
+
+execSync("wasm-pack build -t web", {
+  cwd: join(__dirname, "lib", "crypto"),
+  stdio
+});
+
+execSync("npm i", {
+  cwd: join(__dirname, "src", "app"),
+  stdio
+});
+
+execSync("node esbuild.config.js", {
+  cwd: join(__dirname, "src", "app"),
+  stdio
+});
+
+fs.readdir(join(__dirname, "static")).then(s => s.forEach(v => {
+  if (v.endsWith(".gz") && !v.endsWith(".map.gz")) {
+    fs.rename(
+      join(__dirname, "static", v),
+      join(__dirname, "static", v.replace(v, v.split(".")[0] + "." + v.split(".")[1][0] + "gz"))
+    )
+  }
+}));
+
+execSync(`cargo build ${args.join(" ")}`, {
+  cwd: __dirname,
+  stdio
+});
+
+fs.copyFile(
+  join(__dirname, "lib", "crypto", "pkg", "crypto_bg.wasm"),
+  join(__dirname, "static", "crypto_bg.wasm")
+);
+
+fs.copyFile(
+  join(__dirname, "target", args.includes("--release") ? "release" : "debug", "pastabin"),
+  join(__dirname, "pastabin")
+)

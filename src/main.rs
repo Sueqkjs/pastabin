@@ -1,4 +1,4 @@
-use actix_files as fs;
+mod routes;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 
@@ -8,9 +8,15 @@ async fn main() -> std::io::Result<()> {
   let bind = std::env::var("bind").unwrap();
   let workers = std::env::var("workers").unwrap().parse::<usize>().unwrap();
   HttpServer::new(||
-    App::new().service(
-      fs::Files::new("/static", "./static")
+    App::new()
+    .service(
+      routes::statics
     )
+    .service(routes::index)
+    .service(routes::index_html)
+    .service(routes::create)
+    .service(routes::pasta)
+    .service(routes::status)
   )
   .bind(bind)?
   .workers(workers)

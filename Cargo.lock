@@ -923,9 +923,11 @@ name = "pastabin"
 version = "0.1.0"
 dependencies = [
  "actix-files",
+ "actix-service",
  "actix-web",
  "crypto",
  "dotenv",
+ "mime",
  "serde",
  "tokio",
 ]

@@ -15,6 +15,7 @@
   },
   "homepage": "https://github.com/Sueqkjs/pastabin#readme",
   "dependencies": {
+    "@luncheon/esbuild-plugin-gzip": "^0.1.0",
     "esbuild": "^0.14.10",
     "esbuild-svelte": "^0.6.0",
     "highlight.js": "^11.4.0",

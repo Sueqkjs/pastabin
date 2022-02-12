@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import svelte from "esbuild-svelte";
 import _preprocess from "svelte-preprocess";
+import gzip from "@luncheon/esbuild-plugin-gzip";
 const { sass, typescript } = _preprocess;
 
 await esbuild
@@ -12,10 +13,14 @@ await esbuild
     outdir: "../../static",
     format: "esm",
     platform: "browser",
+    write: false,
     plugins: [
       svelte({
         preprocess: [sass(), typescript()],
       }),
+      gzip({
+        brotli: false,
+      })
     ],
   })
   .catch(console.error);

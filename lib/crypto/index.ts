@@ -1,4 +1,4 @@
-import init, * as mod from "./pkg/wasm";
+import init, * as mod from "./pkg/crypto";
 await init();
 
 type Data = string | Uint8Array;

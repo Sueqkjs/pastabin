@@ -10,6 +10,8 @@ actix-web = "4.0.0-rc.1"
 serde = "1.0.136"
 dotenv = "0.15.0"
 actix-files = "0.6.0-beta.16"
+actix-service = "2.0.2"
+mime = "0.3.16"
 
 [dependencies.tokio]
 version = "1.16.1"
