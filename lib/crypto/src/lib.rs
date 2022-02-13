@@ -1,31 +1,20 @@
 use aes_gcm::{
   aead::{generic_array::GenericArray, Aead, NewAead},
-  Aes256Gcm, Error,
+  Aes256Gcm,
 };
 #[cfg(target_arch = "wasm32")]
 use console_error_panic_hook;
 #[cfg(target_arch = "wasm32")]
-use hex;
-#[cfg(target_arch = "wasm32")]
 use js_sys::*;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
+
+#[cfg(not(target_arch = "wasm32"))]
+use aes_gcm::Error;
 #[cfg(not(target_arch = "wasm32"))]
 use rand::prelude::*;
 #[cfg(not(target_arch = "wasm32"))]
 use rand_chacha::ChaCha20Rng;
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
-
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
-pub fn encode(input: JsString) -> JsValue {
-  hex::encode(input.as_string().unwrap()).into()
-}
-
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
-pub fn decode(input: JsString) -> JsValue {
-  JsValue::from(unsafe { Uint8Array::view(&hex::decode(input.as_string().unwrap()).unwrap()) })
-}
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]

@@ -6,7 +6,7 @@
   $: resultId = "";
   let root;
   let _;
-  
+
   onMount(() => {
     _ = root.querySelector.bind(root);
   });
@@ -23,11 +23,8 @@
     let submit = _("#submit");
     let wrapper = _(".wrapper");
     let r = _("#result");
-    let key = crypto.getRandomValues(new Uint8Array(32));
-    let nonce = crypto.getRandomValues(new Uint8Array(12));
-    console.log(key, nonce)
 
-    let res = await (
+    let { key, id, nonce } = await (
       await fetch("api/pasta", {
         method: "POST",
         headers: {
@@ -35,17 +32,16 @@
         },
         body: JSON.stringify({
           title: title.value,
-          content: aes.toHex(aes.encrypt(key, nonce, aes.toU8(content.value))),
-          showPasswordHash: ""
+          content: content.value,
+          showPasswordHash: "",
         }),
       })
     )
       .json()
-      .catch(console.error);
-    if (!res || res.message) alert("Error: " + res?.message ?? "");
-    resultId = res.id;
-    resultKey = aes.toHex(key);
-    resultNonce = aes.toHex(nonce);
+      .catch(alert);
+    resultId = id;
+    resultKey = key;
+    resultNonce = nonce;
     root.removeChild(title);
     root.removeChild(wrapper);
     root.removeChild(submit);

@@ -28,7 +28,9 @@ pub struct Pasta {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct APIResponse {
-  id: String
+  id: String,
+  key: String,
+  nonce: String,
 }
 
 #[post("/api/pasta")]
@@ -37,9 +39,16 @@ pub async fn create_post(
   db: web::Data<Addr<RedisActor>>,
 ) -> Result<HttpResponse, AWError> {
   let id = hex::encode(crypto::rand(16));
+  let key = crypto::rand(32);
+  let nonce = crypto::rand(12);
+  let plaintext = data.content.clone().into_bytes();
+  let content = hex::encode(
+    crypto::encrypt(key.clone(), nonce.clone(), plaintext)
+      .unwrap()
+      .as_slice(),
+  );
   let dt: DateTime<Utc> = Utc::now();
   let uploaded_timestamp = dt.timestamp_millis();
-  println!("{:?}", data);
 
   db.send(Command(resp_array![
     "HMSET",
@@ -47,7 +56,7 @@ pub async fn create_post(
     "title",
     data.title.clone(),
     "content",
-    data.content.clone(),
+    content.clone(),
     "show_password_hash",
     data.show_password_hash.clone(),
     "uploaded_timestamp",
@@ -55,7 +64,9 @@ pub async fn create_post(
   ]))
   .await??;
   Ok(HttpResponse::Ok().json(APIResponse {
-    id
+    id,
+    key: hex::encode(key),
+    nonce: hex::encode(nonce),
   }))
 }
 

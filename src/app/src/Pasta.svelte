@@ -12,9 +12,7 @@
     const key = params.get("k");
     const nonce = params.get("iv");
     const id = location.pathname.slice(1).split("/")[1];
-    const res = await (await fetch("/api/pasta/" + id))
-      .json()
-      .catch(console.error);
+    const res = await (await fetch("/api/pasta/" + id)).json().catch(alert);
     if (!res) return alert("Something went wrong. " + res?.message ?? "");
     content = escapeHTML(res.content);
     title = escapeHTML(res.title);
@@ -29,7 +27,7 @@
   async function decrypt() {
     const key = aes.toU8(root.querySelector("#key").value);
     const nonce = aes.toU8(root.querySelector("#nonce").value);
-    console.log(content)
+
     let highlighted = hljs.highlightAuto(
       unescapeHTML(aes.toPlain(aes.decrypt(key, nonce, aes.toU8(content))))
     );

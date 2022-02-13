@@ -5,8 +5,10 @@ type _ = Uint8Array;
 
 await init();
 
-export const encrypt = (key: _, nonce: _, plaintext: _): Uint8Array => mod.encrypt(key, nonce, plaintext);
-export const decrypt = (key: _, nonce: _, ciphertext: _): Uint8Array => mod.decrypt(key, nonce, ciphertext);
+export const encrypt = (key: _, nonce: _, plaintext: _): Uint8Array =>
+  mod.encrypt(key, nonce, plaintext);
+export const decrypt = (key: _, nonce: _, ciphertext: _): Uint8Array =>
+  mod.decrypt(key, nonce, ciphertext);
 
 export function toPlain(s: string | _) {
   return Buffer.from(s).toString("utf-8");
