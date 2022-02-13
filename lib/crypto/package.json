@@ -1,0 +1,14 @@
+{
+  "name": "crypto_wasm",
+  "version": "1.0.0",
+  "description": "## これはなに AES_GCMのWasmラッパーですワ 使い方はコードとか見て ライセンスはpastabinと同じMIT license",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sueqkjs",
+  "license": "MIT",
+  "dependencies": {
+    "buffer": "^6.0.3"
+  }
+}

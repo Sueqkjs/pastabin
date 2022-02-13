@@ -1,16 +1,21 @@
 import init, * as mod from "./pkg/crypto";
+import { Buffer } from "buffer";
+
+type _ = Uint8Array;
+
 await init();
 
-type Data = string | Uint8Array;
+export const encrypt = (key: _, nonce: _, plaintext: _): Uint8Array => mod.encrypt(key, nonce, plaintext);
+export const decrypt = (key: _, nonce: _, ciphertext: _): Uint8Array => mod.decrypt(key, nonce, ciphertext);
 
-export const decrypt = (key: Data, nonce: Data, ciphertext: Data) => {
-  return mod.decrypt(toU8(key), toU8(nonce), toU8(ciphertext));
-}
-export const encrypt = (key: Data, nonce: Data, plaintext: Data) => {
-  return mod.encrypt(toU8(key), toU8(nonce), toU8(plaintext));
+export function toPlain(s: string | _) {
+  return Buffer.from(s).toString("utf-8");
 }
 
-function toU8(arg: Data): Uint8Array {
-  if (arg instanceof String) return Uint8Array.from(Array.from(arg).map(letter => letter.charCodeAt(0)));
-  else if (arg instanceof Uint8Array) return arg;
+export function toHex(s: Uint8Array) {
+  return Buffer.from(s).toString("hex");
+}
+
+export function toU8(s: string) {
+  return Uint8Array.from(Buffer.from(s, "hex"));
 }

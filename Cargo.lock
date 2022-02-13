@@ -727,6 +727,7 @@ version = "0.1.0"
 dependencies = [
  "aes-gcm",
  "console_error_panic_hook",
+ "hex",
  "js-sys",
  "rand 0.8.4",
  "rand_chacha 0.3.1",

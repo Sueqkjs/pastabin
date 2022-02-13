@@ -19,6 +19,7 @@ async fn main() -> std::io::Result<()> {
       .service(routes::pasta)
       .service(routes::status)
       .service(routes::get_pasta)
+      .service(routes::create_post)
   })
   .bind(bind)?
   .workers(workers)

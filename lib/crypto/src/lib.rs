@@ -1,11 +1,31 @@
-use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
-use js_sys::*;
+use aes_gcm::{
+  aead::{generic_array::GenericArray, Aead, NewAead},
+  Aes256Gcm, Error,
+};
+#[cfg(target_arch = "wasm32")]
 use console_error_panic_hook;
-use aes_gcm::{Error, Aes256Gcm, aead::{Aead, NewAead, generic_array::GenericArray}};
+#[cfg(target_arch = "wasm32")]
+use hex;
+#[cfg(target_arch = "wasm32")]
+use js_sys::*;
 #[cfg(not(target_arch = "wasm32"))]
 use rand::prelude::*;
 #[cfg(not(target_arch = "wasm32"))]
 use rand_chacha::ChaCha20Rng;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn encode(input: JsString) -> JsValue {
+  hex::encode(input.as_string().unwrap()).into()
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn decode(input: JsString) -> JsValue {
+  JsValue::from(unsafe { Uint8Array::view(&hex::decode(input.as_string().unwrap()).unwrap()) })
+}
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
@@ -19,13 +39,14 @@ pub fn encrypt(_key: Uint8Array, _nonce: Uint8Array, _plaintext: Uint8Array) -> 
   let cipher = Aes256Gcm::new(key);
   match cipher.encrypt(nonce, plaintext.as_ref()) {
     Ok(value) => JsValue::from(unsafe { Uint8Array::view(&value) }),
-    Err(error) => JsValue::from_str(&error.to_string())
+    Err(error) => JsValue::from_str(&error.to_string()),
   }
 }
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn decrypt(_key: Uint8Array, _nonce: Uint8Array, _ciphertext: Uint8Array) -> JsValue {
+  console_error_panic_hook::set_once();
   let key_vec = &_key.to_vec();
   let key = GenericArray::from_slice(key_vec);
   let nonce_vec = &_nonce.to_vec();
@@ -34,7 +55,7 @@ pub fn decrypt(_key: Uint8Array, _nonce: Uint8Array, _ciphertext: Uint8Array) ->
   let cipher = Aes256Gcm::new(key);
   match cipher.decrypt(nonce, ciphertext.as_ref()) {
     Ok(value) => JsValue::from(unsafe { Uint8Array::view(&value) }),
-    Err(error) => JsValue::from_str(&error.to_string())
+    Err(error) => JsValue::from_str(&error.to_string()),
   }
 }
 
@@ -56,9 +77,9 @@ pub fn encrypt(_key: Vec<u8>, _nonce: Vec<u8>, plaintext: Vec<u8>) -> Result<Vec
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn rand(bit: usize) -> Vec<u8> {
+pub fn rand(bit: u8) -> Vec<u8> {
   let mut csp_rng = ChaCha20Rng::from_entropy();
-  let mut data: Vec<u8> = Vec::with_capacity(bit);
+  let mut data: Vec<u8> = (0..bit).collect();
   csp_rng.fill_bytes(&mut data);
   data
 }

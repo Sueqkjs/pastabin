@@ -1,6 +1,5 @@
 use actix_files::NamedFile;
-use actix_web::{get, http::header::ContentEncoding, HttpRequest, HttpResponse, Responder, Result};
-use mime::{Mime, APPLICATION_JAVASCRIPT, TEXT_CSS, TEXT_PLAIN};
+use actix_web::{get, HttpRequest, HttpResponse, Responder, Result};
 
 static HTML: &str = r#"<!doctype html>
 <html>
@@ -8,7 +7,7 @@ static HTML: &str = r#"<!doctype html>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
   <body>
-    <script defer type="module" src="/static/app.jgz"></script>
+    <script type="module" src="/static/app.jgz"></script>
   </body>
 </html>"#;
 
@@ -60,8 +59,13 @@ pub async fn statics(req: HttpRequest) -> Result<HttpResponse> {
   } else if ext == "wasm" {
     content_type = "application/wasm";
   }
-  println!("{:?}", encoding);
   let mut file = NamedFile::open(format!("./static/{}", path).parse::<std::path::PathBuf>()?)?
-  .respond_to(&req).await?;
-  Ok(HttpResponse::Ok().header("Content-type", content_type).header("Content-encoding", encoding).streaming(file.take_body()))
+    .respond_to(&req)
+    .await?;
+  Ok(
+    HttpResponse::Ok()
+      .header("Content-type", content_type)
+      .header("Content-encoding", encoding)
+      .streaming(file.take_body()),
+  )
 }
