@@ -1,8 +1,0 @@
-export default `<!doctype html>
-    <html>
-      <head>
-      </head>
-      <body>
-        <script src="/app.js"></script>
-      </body>
-    </html>`;

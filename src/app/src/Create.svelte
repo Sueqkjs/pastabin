@@ -1,13 +1,15 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import * as aes from "../../../lib/crypto";
   $: resultKey = "";
   $: resultNonce = "";
   $: resultId = "";
-
   let root;
   let _;
-  window.onload = async () => {
+
+  onMount(() => {
     _ = root.querySelector.bind(root);
-  };
+  });
   const contentChange = () => {
     const content = _(".wrapper #content");
     let maxC = Math.max(...content.value.split("\n").map((x) => x.length));
@@ -21,7 +23,8 @@
     let submit = _("#submit");
     let wrapper = _(".wrapper");
     let r = _("#result");
-    let res = await (
+
+    let { key, id, nonce } = await (
       await fetch("api/pasta", {
         method: "POST",
         headers: {
@@ -30,15 +33,15 @@
         body: JSON.stringify({
           title: title.value,
           content: content.value,
+          showPasswordHash: "",
         }),
       })
     )
       .json()
-      .catch(console.error);
-    if (!res || res.message) alert("Error: " + res?.message ?? "");
-    resultId = res.id;
-    resultKey = res.key;
-    resultNonce = res.nonce;
+      .catch(alert);
+    resultId = id;
+    resultKey = key;
+    resultNonce = nonce;
     root.removeChild(title);
     root.removeChild(wrapper);
     root.removeChild(submit);

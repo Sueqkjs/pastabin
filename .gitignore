@@ -103,3 +103,11 @@ dist
 # TernJS port file
 .tern-port
 data/
+
+# Added by cargo
+
+/target
+
+# app build
+/static
+pastabin

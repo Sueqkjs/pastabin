@@ -1,18 +1,18 @@
 <script lang="ts">
-  import * as aes from "../wasm/web";
+  import * as aes from "../../../lib/crypto/index";
   import hljs from "highlight.js";
+  import { onMount } from "svelte";
+
   let root;
   $: content = "Loading...";
   $: title = "Loading...";
   $: uploadedTimestamp = 0;
-  window.onload = async () => {
+  onMount(async () => {
     const params = new URLSearchParams(location.search.slice(1));
     const key = params.get("k");
     const nonce = params.get("iv");
     const id = location.pathname.slice(1).split("/")[1];
-    const res = await (await fetch("/api/pasta/" + id))
-      .json()
-      .catch(console.error);
+    const res = await (await fetch("/api/pasta/" + id)).json().catch(alert);
     if (!res) return alert("Something went wrong. " + res?.message ?? "");
     content = escapeHTML(res.content);
     title = escapeHTML(res.title);
@@ -22,13 +22,14 @@
       root.querySelector("#nonce").value = escapeHTML(nonce);
       await decrypt();
     }
-  };
+  });
 
   async function decrypt() {
-    const key = root.querySelector("#key").value;
-    const nonce = root.querySelector("#nonce").value;
+    const key = aes.toU8(root.querySelector("#key").value);
+    const nonce = aes.toU8(root.querySelector("#nonce").value);
+
     let highlighted = hljs.highlightAuto(
-      unescapeHTML((await aes.decrypt(content, key, nonce)).plainText)
+      unescapeHTML(aes.toPlain(aes.decrypt(key, nonce, aes.toU8(content))))
     );
     content = highlighted.value.replace("\n", "<br>");
   }
