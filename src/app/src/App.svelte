@@ -34,7 +34,7 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/github-dark.min.css"
   />
-  <link rel="stylesheet" href="/static/app.cgz" />
+  <link rel="stylesheet" href="/static/app.css" />
   <title>PastaBin</title>
 </svelte:head>
 
