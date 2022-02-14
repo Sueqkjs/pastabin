@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+const { exec } = require("child_process");
+const { promisify } = require("util");
+const e = promisify(exec);
+const opt = {
+  stdio: [process.stdin, process.stdout, process.stderr],
+  cwd: __dirname,
+};
+
+(async () => {
+  await e("cargo install wasm-pack", opt).catch(async (err) => {
+    console.error("rust toolchains not found. installing rustup.");
+    await e("curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh", opt);
+    console.log("installed. please re-run this script");
+    process.exit();
+  });
+  await e("npm").catch(async(err) => {
+    console.error("npm/nodejs not found.");
+    process.exit();
+  });
+})();
