@@ -17,6 +17,11 @@ const stdio = ["ignore", process.stdout, process.stderr];
   });
 
   execSync("npm i", {
+    cwd: join(__dirname, "lib", "crypto"),
+    stdio,
+  });
+
+  execSync("npm i", {
     cwd: join(__dirname, "src", "app"),
     stdio,
   });
