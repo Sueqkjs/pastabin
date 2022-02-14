@@ -17,6 +17,7 @@ redis-async = "0.6.3"
 actix-http = "2.2.2"
 hex = "0.4.3"
 chrono = "0.4.19"
+env_logger = "*"
 
 [dependencies.tokio]
 version = "1.16.1"

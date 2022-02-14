@@ -26,22 +26,14 @@ const stdio = ["ignore", process.stdout, process.stderr];
     stdio,
   });
 
-  execSync("node esbuild.config.js", {
-    cwd: join(__dirname, "src", "app"),
+  execSync("npm i", {
+    cwd: join(__dirname, "lib", "crypto"),
     stdio,
   });
 
-  (await fs.readdir(join(__dirname, "static"))).forEach((v) => {
-    if (v.endsWith(".gz") && !v.endsWith(".map.gz")) {
-      fs.rename(
-        join(__dirname, "static", v),
-        join(
-          __dirname,
-          "static",
-          v.replace(v, v.split(".")[0] + "." + v.split(".")[1][0] + "gz")
-        )
-      );
-    }
+  execSync("node esbuild.config.js", {
+    cwd: join(__dirname, "src", "app"),
+    stdio,
   });
 
   execSync(`cargo build ${args.join(" ")}`, {
