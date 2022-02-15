@@ -1,8 +1,10 @@
 <script lang="ts">
+  import Framework7 from "framework7/lite-bundle";
+  import Framework7Svelte, { Navbar, Icon } from "framework7-svelte";
+  Framework7.use(Framework7Svelte);
   import Create from "./Create.svelte";
   import Status from "./Status.svelte";
   import Index from "./Index.svelte";
-  import Navigator from "./Navigator.svelte";
   import Pasta from "./Pasta.svelte";
   const path = location.pathname.slice(1).split("/");
   let Page = Index;
@@ -27,9 +29,6 @@
 
 <svelte:head>
   <meta name="viewport" content="width=device-width" />
-  <script
-    type="module"
-    src="https://unpkg.com/ionicons@5.0.0/dist/ionicons/ionicons.esm.js"></script>
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/github-dark.min.css"
@@ -38,5 +37,8 @@
   <title>PastaBin</title>
 </svelte:head>
 
-<Navigator />
+<Navbar>
+  <Icon f7="house_fill"></Icon>
+</Navbar>
+
 <svelte:component this={Page} />
