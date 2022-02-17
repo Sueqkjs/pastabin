@@ -1,6 +1,6 @@
 <script lang="ts">
   import Framework7 from "framework7/lite-bundle";
-  import Framework7Svelte, { Navbar, Icon } from "framework7-svelte";
+  import Framework7Svelte, {Navbar, Icon} from "framework7-svelte";
   Framework7.use(Framework7Svelte);
   import Create from "./Create.svelte";
   import Status from "./Status.svelte";
@@ -29,16 +29,14 @@
 
 <svelte:head>
   <meta name="viewport" content="width=device-width" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/github-dark.min.css"
-  />
-  <link rel="stylesheet" href="/static/app.css" />
+  <script>
+    import "highlight.js/scss/github-dark.scss"
+  </script>
   <title>PastaBin</title>
 </svelte:head>
 
 <Navbar>
-  <Icon f7="house_fill"></Icon>
+  <Icon f7="house_fill" />
 </Navbar>
 
 <svelte:component this={Page} />

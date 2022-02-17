@@ -7,7 +7,7 @@ static HTML: &str = r#"<!doctype html>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
   <body>
-    <script type="module" src="/static/app.js"></script>
+    <script type="module" src="/assets/app.c9c99da4.js"></script>
   </body>
 </html>"#;
 
@@ -38,10 +38,10 @@ pub async fn status() -> impl Responder {
   HttpResponse::Ok().body(HTML)
 }
 
-#[get("/static/{filename:.*}")]
+#[get("/assets/{filename:.*}")]
 pub async fn statics(req: HttpRequest) -> impl Responder {
   let path = req.match_info().query("filename");
-  NamedFile::open(format!("./static/{}", path).parse::<std::path::PathBuf>()?)?
+  NamedFile::open(format!("./assets/{}", path).parse::<std::path::PathBuf>()?)?
     .respond_to(&req)
     .await
 }

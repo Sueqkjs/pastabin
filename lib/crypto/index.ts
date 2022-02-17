@@ -1,5 +1,5 @@
 import init, * as mod from "./pkg/crypto";
-import { Buffer } from "buffer";
+import { Buffer } from "buffer/";
 
 type _ = Uint8Array;
 
