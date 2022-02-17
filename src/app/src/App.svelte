@@ -1,7 +1,6 @@
 <script lang="ts">
-  import Framework7 from "framework7/lite-bundle";
-  import Framework7Svelte, {Navbar, Icon} from "framework7-svelte";
-  Framework7.use(Framework7Svelte);
+  import { HouseFill } from "framework7-icons/svelte";
+  import { Navbar, Page as F7Page } from "framework7-svelte";
   import Create from "./Create.svelte";
   import Status from "./Status.svelte";
   import Index from "./Index.svelte";
@@ -29,14 +28,19 @@
 
 <svelte:head>
   <meta name="viewport" content="width=device-width" />
-  <script>
-    import "highlight.js/scss/github-dark.scss"
-  </script>
+  <style lang="scss">
+    @import "highlight.js/scss/github-dark.scss";
+    HouseFill {
+      font-size: 2em;
+    }
+  </style>
   <title>PastaBin</title>
 </svelte:head>
 
-<Navbar>
-  <Icon f7="house_fill" />
+<F7Page>
+<Navbar title="PastaBin">
+<HouseFill />
 </Navbar>
 
 <svelte:component this={Page} />
+</F7Page>

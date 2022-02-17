@@ -1,47 +1,26 @@
 use actix_files::NamedFile;
 use actix_web::{get, HttpRequest, HttpResponse, Responder};
+use std::fs;
 
-static HTML: &str = r#"<!doctype html>
-<html>
-  <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  </head>
-  <body>
-    <script type="module" src="/assets/app.c9c99da4.js"></script>
-  </body>
-</html>"#;
-
-#[get("/index.html")]
-pub async fn index_html() -> impl Responder {
-  HttpResponse::Ok().body(HTML)
+/*#[get("/index.html")]
+#[get("/create")]
+#[get("/pasta/{id}")]
+#[get("/status/{code}")]*/
+pub async fn app_page() -> impl Responder {
+  HttpResponse::Ok().body(fs::read_to_string("./static/index.html").unwrap())
 }
 
 #[get("/")]
 pub async fn index() -> impl Responder {
   HttpResponse::Found()
     .header("Location", "/index.html")
-    .body(HTML)
-}
-
-#[get("/create")]
-pub async fn create() -> impl Responder {
-  HttpResponse::Ok().body(HTML)
-}
-
-#[get("/pasta/{id}")]
-pub async fn pasta() -> impl Responder {
-  HttpResponse::Ok().body(HTML)
-}
-
-#[get("/status/{code}")]
-pub async fn status() -> impl Responder {
-  HttpResponse::Ok().body(HTML)
+    .body("")
 }
 
 #[get("/assets/{filename:.*}")]
 pub async fn statics(req: HttpRequest) -> impl Responder {
   let path = req.match_info().query("filename");
-  NamedFile::open(format!("./assets/{}", path).parse::<std::path::PathBuf>()?)?
+  NamedFile::open(format!("./static/assets/{}", path).parse::<std::path::PathBuf>()?)?
     .respond_to(&req)
     .await
 }
