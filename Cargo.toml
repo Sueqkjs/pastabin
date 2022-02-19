@@ -18,6 +18,7 @@ actix-http = "2.2.2"
 hex = "0.4.3"
 chrono = "0.4.19"
 env_logger = "*"
+sha2 = "0.10.2"
 
 [dependencies.tokio]
 version = "1.16.1"

@@ -1,5 +1,15 @@
 <script lang="ts">
-  import { App, View, Link, Navbar, NavRight, NavLeft, NavTitle, Icon, RouterContextProvider } from "framework7-svelte";
+  import {
+    App,
+    View,
+    Link,
+    Navbar,
+    NavRight,
+    NavLeft,
+    NavTitle,
+    Icon,
+    RouterContextProvider,
+  } from "framework7-svelte";
   import routes from "./routes";
 
   const f7Params = {
@@ -42,9 +52,19 @@
       <NavTitle>PastaBin</NavTitle>
     </NavLeft>
     <NavRight>
-      <Link href="/index.html" reloadCurrent iconF7="house_fill" iconSize="40px" />
+      <Link
+        href="/index.html"
+        reloadCurrent
+        iconF7="house_fill"
+        iconSize="40px"
+      />
       <Link href="/create" reloadCurrent iconF7="plus" iconSize="40px" />
-      <Link href="https://github.com/Sueqkjs/pastabin" external iconF7="logo_github" iconSize="40px" />
+      <Link
+        href="https://github.com/Sueqkjs/pastabin"
+        external
+        iconF7="logo_github"
+        iconSize="40px"
+      />
     </NavRight>
   </Navbar>
   <View main onViewInit={mainInit} />

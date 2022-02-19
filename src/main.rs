@@ -25,6 +25,7 @@ async fn main() -> std::io::Result<()> {
       .service(routes::index)
       .service(routes::get_pasta)
       .service(routes::create_post)
+      .service(routes::password_check)
       .route("/index.html", web::get().to(routes::app_page))
       .route("/create", web::get().to(routes::app_page))
       .route("/pasta/{id}", web::get().to(routes::app_page))
