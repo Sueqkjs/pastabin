@@ -1,93 +1,156 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import {
+    Page,
+    List,
+    Block,
+    BlockHeader,
+    BlockTitle,
+    ListInput,
+    Button,
+    f7,
+  } from "framework7-svelte";
   import * as aes from "../../../lib/crypto";
+
   $: resultKey = "";
   $: resultNonce = "";
   $: resultId = "";
+  $: title = "";
+  $: content = "";
+  $: isLoading = false;
   let root;
   let _;
 
   onMount(() => {
     _ = root.querySelector.bind(root);
+    _("#result").style.display = "none";
   });
-  const contentChange = () => {
-    const content = _(".wrapper #content");
-    let maxC = Math.max(...content.value.split("\n").map((x) => x.length));
-    let maxL = content.value.split("\n").length;
-    content.rows = maxL;
-    content.cols = maxC;
-  };
-  async function post() {
-    let title = _("#title");
-    let content = _(".wrapper #content");
-    let submit = _("#submit");
-    let wrapper = _(".wrapper");
-    let r = _("#result");
 
-    let { key, id, nonce } = await (
-      await fetch("api/pasta", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: title.value,
-          content: content.value,
-          showPasswordHash: "",
-        }),
-      })
-    )
-      .json()
-      .catch(alert);
-    resultId = id;
-    resultKey = key;
-    resultNonce = nonce;
-    root.removeChild(title);
-    root.removeChild(wrapper);
-    root.removeChild(submit);
-    r.style.display = "block";
+  async function post() {
+    let showPassword = "";
+    f7.dialog.password(
+      "This Pasta's Password",
+      "PastaBin",
+      async (v: string) => {
+        showPassword = v;
+        if (showPassword.trim().length === 0)
+          return f7.dialog.alert("Please Enter Password.");
+        isLoading = true;
+        let result = _("#result");
+        let input = _("#input");
+        let key = rand(32);
+        let nonce = rand(12);
+        content = content
+          .replaceAll(/<div( class="")?>/g, "\n")
+          .replaceAll("</div>", "")
+          .replaceAll("&nbsp;", " ");
+        let { id } = await (
+          await fetch("api/pasta", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title,
+              showPasswordHash: aes.toHex(
+                new Uint8Array(
+                  await crypto.subtle.digest(
+                    "SHA-512",
+                    aes.toU8(showPassword, true)
+                  )
+                )
+              ),
+              content: aes.toHex(
+                aes.encrypt(key, nonce, aes.toU8(content, true))
+              ),
+            }),
+          })
+        )
+          .json()
+          .catch((e) => {
+            isLoading = false;
+          });
+        resultId = id;
+        resultKey = aes.toHex(key);
+        resultNonce = aes.toHex(nonce);
+        result.style.display = "block";
+        input.style.display = "none";
+      },
+      () => void 0
+    );
+  }
+
+  function rand(bit: number): Uint8Array {
+    return crypto.getRandomValues(new Uint8Array(bit));
   }
 </script>
 
-<main bind:this={root}>
-  <h1>Boil the pasta</h1>
-  <input id="title" placeholder="Title" /> <br />
-  <div class="wrapper">
-    <textarea on:input={contentChange} id="content" placeholder="Content" />
-    <br />
+<Page>
+  <div bind:this={root}>
+    <div id="input">
+      <BlockTitle>Boil the pasta</BlockTitle>
+      <BlockHeader>Warning: Title value was not encrypted</BlockHeader>
+      <List>
+        <ListInput
+          type="texteditor"
+          label="Title"
+          resizable
+          placeholder="ex: very very secret source code"
+          textEditorParams={{
+            el: "",
+            mode: "popver",
+          }}
+          onTextEditorChange={(v) => (title = v)}
+        />
+        <ListInput
+          type="texteditor"
+          label="Content"
+          placeholder="Enter text...."
+          resizable
+          textEditorParams={{
+            el: "",
+            mode: "popover",
+          }}
+          onTextEditorChange={(v) => (content = v)}
+        />
+        <Button fill preloader loading={isLoading} onClick={post}>Boil</Button>
+      </List>
+    </div>
+    <Block id="result" inset>
+      <BlockTitle>Id</BlockTitle>
+      <Block>
+        <p>{resultId}</p>
+      </Block>
+      <BlockTitle>Key</BlockTitle>
+      <Block><p>{resultKey}</p></Block>
+      <BlockTitle>Nonce</BlockTitle>
+      <Block><p>{resultNonce}</p></Block>
+      <BlockTitle>Url (Unsecure)</BlockTitle>
+      <Block>
+        <p id="url">
+          {location.origin}/pasta/{resultId}?k={resultKey}&amp;iv={resultNonce}
+        </p>
+        <Button
+          onClick={() => {
+            navigator.clipboard
+              .writeText(_("#url").innerHTML.replaceAll("&amp;", "&"))
+              .then(() => {
+                f7.notification.create({
+                  icon: "<i class=\"f7-icons\" style=\"font-size: 16px; width: 16px; height: 16px;\">house_fill</i>",
+                  title: "PastaBin",
+                  titleRightText: "now",
+                  subtitle: "Copied!",
+                  text: "Been copied the url to your clipboard",
+                  closeTimeout: 1500,
+                }).open();
+              })
+              .catch(alert);
+          }}
+          fill
+        >
+          Copy
+        </Button>
+      </Block>
+    </Block>
   </div>
-  <input id="submit" on:click={post} type="button" value="Boil" />
-  <div id="result">
-    <p>Id:</p>
-    <input readonly class="result" value={resultId} />
-    <p>Key:</p>
-    <input readonly class="result" value={resultKey} />
-    <p>Nonce:</p>
-    <input readonly class="result" value={resultNonce} />
-    <p>Url(UnSecure):</p>
-    <input
-      readonly
-      class="result"
-      value="{location.origin}/pasta/{resultId}?iv={resultNonce}&k={resultKey}"
-    />
-  </div>
-</main>
-
-<style lang="scss">
-  #result {
-    display: none;
-  }
-  input,
-  textarea {
-    color: white;
-    background: #222;
-    border-radius: 4px;
-    border: 2px solid #333;
-  }
-  .wrapper {
-    width: 80%;
-    #content {
-      width: 100%;
-    }
-  }
-</style>
+</Page>

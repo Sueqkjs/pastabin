@@ -1,37 +1,72 @@
 <script lang="ts">
   import * as aes from "../../../lib/crypto/index";
   import hljs from "highlight.js";
+  import {
+    Page,
+    Block,
+    BlockTitle,
+    BlockHeader,
+    List,
+    ListInput,
+    Button,
+    f7,
+  } from "framework7-svelte";
   import { onMount } from "svelte";
 
-  let root;
+  const params = new URLSearchParams(location.search.slice(1));
+  $: key = escapeHTML(params.get("k"));
+  $: nonce = escapeHTML(params.get("iv"));
   $: content = "Loading...";
   $: title = "Loading...";
   $: uploadedTimestamp = 0;
+
   onMount(async () => {
-    const params = new URLSearchParams(location.search.slice(1));
-    const key = params.get("k");
-    const nonce = params.get("iv");
+    let password = "";
     const id = location.pathname.slice(1).split("/")[1];
-    const res = await (await fetch("/api/pasta/" + id)).json().catch(alert);
-    if (!res) return alert("Something went wrong. " + res?.message ?? "");
-    content = escapeHTML(res.content);
+    const passworded = (
+      await (await fetch("/api/pasta/" + id)).json().catch(alert)
+    )?.passworded;
+    if (passworded)
+      password = await passwordAsync("This Pasta's password", "PastaBin").catch(
+        (x) => ""
+      );
+    const res = await (
+      await fetch("/api/pasta/" + id, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          showPassword: password,
+        }),
+      })
+    )
+      .json()
+      .catch(alert);
+    if (!res || (!res.content && !res.title && !res.id))
+      return alert("Something went wrong. " + res ?? "");
+    content = res.content;
     title = escapeHTML(res.title);
-    uploadedTimestamp = res.uploadedTimestamp;
+    uploadedTimestamp = res.uploaded_timestamp;
     if (key && nonce) {
-      root.querySelector("#key").value = escapeHTML(key);
-      root.querySelector("#nonce").value = escapeHTML(nonce);
       await decrypt();
     }
   });
 
   async function decrypt() {
-    const key = aes.toU8(root.querySelector("#key").value);
-    const nonce = aes.toU8(root.querySelector("#nonce").value);
+    const _key = aes.toU8(key);
+    const _nonce = aes.toU8(nonce);
+    content = hljs
+      .highlightAuto(
+        unescapeHTML(aes.toPlain(aes.decrypt(_key, _nonce, aes.toU8(content))))
+      )
+      .value.replaceAll("\n", "<br>");
+  }
 
-    let highlighted = hljs.highlightAuto(
-      unescapeHTML(aes.toPlain(aes.decrypt(key, nonce, aes.toU8(content))))
-    );
-    content = highlighted.value.replace("\n", "<br>");
+  function passwordAsync(title: string, text: string): Promise<string> {
+    return new Promise((res, rej) => {
+      f7.dialog.password(title, text, res, rej);
+    });
   }
 
   function unescapeHTML(html) {
@@ -61,34 +96,43 @@
   }
 </script>
 
-<main>
-  <h1>{title}</h1>
-  <div bind:this={root} id="pasta">
-    <input id="key" placeholder="Encrypt Key" /> <br />
-    <input id="nonce" placeholder="Encrypt nonce(iv)" /> <br />
-    <input on:click={decrypt} id="decrypt" type="button" value="Decrypt" />
-    <br /> <br />
-    <div id="code">{@html content}</div>
-  </div>
-</main>
-
-<style lang="scss">
-  input,
-  #code {
-    color: white;
-    background: #222;
-    border: 2px solid #333;
-    border-radius: 4px;
-  }
-  #pasta {
-    width: 80%;
-    #code {
-      background: #111;
-      font-weight: lighter;
-      font-family: "Courier New", Courier, monospace;
-      width: 100%;
-      overflow: scroll;
-      white-space: pre-wrap;
-    }
-  }
-</style>
+<Page>
+  <BlockTitle>{title}</BlockTitle>
+  <BlockHeader
+    >Uploaded At: {new Intl.DateTimeFormat("en-US", {
+      dateStyle: "full",
+      timeStyle: "long",
+    }).format(uploadedTimestamp)}</BlockHeader
+  >
+  <List>
+    <ListInput
+      type="texteditor"
+      label="Key"
+      placeholder="Decrypt Key"
+      resizable
+      textEditorParams={{
+        mode: "popover",
+        el: "",
+      }}
+      value={key}
+      onTextEditorChange={(value) => (key = value)}
+    />
+    <ListInput
+      type="texteditor"
+      label="Nonce"
+      placeholder="Decrypt Nonce"
+      resizable
+      textEditorParams={{
+        mode: "popover",
+        el: "",
+      }}
+      value={nonce}
+      onTextEditorChange={(value) => (nonce = value)}
+    />
+    <Button fill preloader onClick={decrypt}>Decrypt</Button>
+  </List>
+  <BlockTitle>Content</BlockTitle>
+  <Block inset id="content"><pre>{@html content}</pre></Block>
+  <br />
+  <br />
+</Page>

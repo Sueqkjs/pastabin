@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "build": "npx vite build"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Sueqkjs/pastabin.git"
@@ -16,14 +18,17 @@
   "homepage": "https://github.com/Sueqkjs/pastabin#readme",
   "dependencies": {
     "@luncheon/esbuild-plugin-gzip": "^0.1.0",
-    "esbuild": "^0.14.10",
-    "esbuild-svelte": "^0.6.0",
+    "@sveltejs/vite-plugin-svelte": "1.0.0-next.37",
+    "@tsconfig/svelte": "^3.0.0",
+    "framework7": "^6.3.16",
+    "framework7-icons": "^5.0.5",
+    "framework7-svelte": "^6.3.16",
     "highlight.js": "^11.4.0",
     "sass": "^1.49.0",
     "statuses": "^2.0.1",
     "svelte-preprocess": "^4.10.1",
     "typescript": "^4.5.4",
-    "statuses": "^2.0.1"
+    "vite": "^2.8.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",

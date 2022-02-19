@@ -1,10 +1,13 @@
 <script lang="ts">
-  import { codes } from "statuses";
+  import statuses from "statuses";
+  import { BlockTitle, BlockHeader, Block, Page } from "framework7-svelte";
   const code = location.pathname.slice(1).split("/").pop();
-  const message = "Error: " + codes[code];
+  const message = "Status: " + statuses.message[code];
 </script>
 
-<main>
-  <h1>{code}</h1>
-  <p>{message}</p>
-</main>
+<Page>
+  <Block inset>
+    <BlockTitle>{code}</BlockTitle>
+    <BlockHeader>{message}</BlockHeader>
+  </Block>
+</Page>

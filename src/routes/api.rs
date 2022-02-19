@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 use hex;
 use redis_async::{resp::RespValue, resp_array};
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha512};
 extern crate crypto;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -29,8 +30,17 @@ pub struct Pasta {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct APIResponse {
   id: String,
-  key: String,
-  nonce: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PastaRequest {
+  #[serde(alias = "showPassword")]
+  show_password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PasswordCheckResponse {
+  passworded: bool,
 }
 
 #[post("/api/pasta")]
@@ -39,40 +49,29 @@ pub async fn create_post(
   db: web::Data<Addr<RedisActor>>,
 ) -> Result<HttpResponse, AWError> {
   let id = hex::encode(crypto::rand(16));
-  let key = crypto::rand(32);
-  let nonce = crypto::rand(12);
-  let plaintext = data.content.clone().into_bytes();
-  let content = hex::encode(
-    crypto::encrypt(key.clone(), nonce.clone(), plaintext)
-      .unwrap()
-      .as_slice(),
-  );
   let dt: DateTime<Utc> = Utc::now();
   let uploaded_timestamp = dt.timestamp_millis();
 
   db.send(Command(resp_array![
     "HMSET",
-    id.clone(),
+    &id,
     "title",
-    data.title.clone(),
+    &data.title,
     "content",
-    content.clone(),
+    &data.content,
     "show_password_hash",
-    data.show_password_hash.clone(),
+    &data.show_password_hash,
     "uploaded_timestamp",
     uploaded_timestamp.to_string()
   ]))
   .await??;
-  Ok(HttpResponse::Ok().json(APIResponse {
-    id,
-    key: hex::encode(key),
-    nonce: hex::encode(nonce),
-  }))
+  Ok(HttpResponse::Ok().json(APIResponse { id }))
 }
 
-#[get("/api/pasta/{id}")]
+#[post("/api/pasta/{id}")]
 pub async fn get_pasta(
   req: HttpRequest,
+  data: web::Json<PastaRequest>,
   db: web::Data<Addr<RedisActor>>,
 ) -> Result<HttpResponse, AWError> {
   let id = req.match_info().query("id").parse::<String>()?;
@@ -99,14 +98,62 @@ pub async fn get_pasta(
       let content = resp[1].clone();
       let show_password_hash = resp[2].clone();
       let uploaded_timestamp = resp[3].clone().parse::<i64>().unwrap();
-      Ok(HttpResponse::Ok().json(Pasta {
-        id,
-        title,
-        content,
-        uploaded_timestamp,
-        show_password_hash,
-      }))
+      let mut hasher = Sha512::new();
+      hasher.update(&data.show_password);
+      let requested_show_password_hash = hasher.finalize();
+      let hash_ok = hex::decode(&show_password_hash)
+        .unwrap()
+        .eq(&requested_show_password_hash.to_vec());
+      if show_password_hash.len() == 0 || hash_ok {
+        Ok(HttpResponse::Ok().json(Pasta {
+          id,
+          title,
+          content,
+          uploaded_timestamp,
+          show_password_hash,
+        }))
+      } else {
+        Ok(HttpResponse::Forbidden().json(Pasta {
+          id: "".into(),
+          title: "".into(),
+          content: "".into(),
+          uploaded_timestamp: 0,
+          show_password_hash: "".into(),
+        }))
+      }
     }
     _ => Ok(HttpResponse::Ok().body("")),
+  }
+}
+
+#[get("/api/pasta/{id}")]
+pub async fn password_check(
+  req: HttpRequest,
+  db: web::Data<Addr<RedisActor>>,
+) -> Result<HttpResponse, AWError> {
+  let id = req.match_info().query("id").parse::<String>()?;
+  match db
+    .send(Command(resp_array![
+      "HMGET",
+      id.clone(),
+      "show_password_hash"
+    ]))
+    .await??
+  {
+    RespValue::Array(pasta) => {
+      let resp = pasta
+        .iter()
+        .map(|x| match x {
+          RespValue::BulkString(y) => String::from_utf8(y.to_vec()).unwrap(),
+          _ => "".to_string(),
+        })
+        .collect::<Vec<String>>();
+      if resp[0].len() == 0 {
+        Ok(HttpResponse::Ok().json(PasswordCheckResponse { passworded: false }))
+      } else {
+        Ok(HttpResponse::Ok().json(PasswordCheckResponse { passworded: true }))
+      }
+    }
+    _ => Ok(HttpResponse::NotFound().json(PasswordCheckResponse { passworded: false })),
   }
 }

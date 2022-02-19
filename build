@@ -31,7 +31,7 @@ const stdio = ["ignore", process.stdout, process.stderr];
     stdio,
   });
 
-  execSync("node esbuild.config.js", {
+  execSync("npm run build", {
     cwd: join(__dirname, "src", "app"),
     stdio,
   });
@@ -40,11 +40,6 @@ const stdio = ["ignore", process.stdout, process.stderr];
     cwd: __dirname,
     stdio,
   });
-
-  await fs.copyFile(
-    join(__dirname, "lib", "crypto", "pkg", "crypto_bg.wasm"),
-    join(__dirname, "static", "crypto_bg.wasm")
-  );
 
   await fs.copyFile(
     join(
