@@ -1,46 +1,51 @@
 <script lang="ts">
-  import { HouseFill } from "framework7-icons/svelte";
-  import { Navbar, Page as F7Page } from "framework7-svelte";
-  import Create from "./Create.svelte";
-  import Status from "./Status.svelte";
-  import Index from "./Index.svelte";
-  import Pasta from "./Pasta.svelte";
-  const path = location.pathname.slice(1).split("/");
-  let Page = Index;
+  import { App, View, Link, Navbar, NavRight, NavLeft, NavTitle, Icon, RouterContextProvider } from "framework7-svelte";
+  import routes from "./routes";
 
-  switch (path[0]) {
-    case "index.html":
-      Page = Index;
-      break;
-    case "pasta":
-      Page = Pasta;
-      break;
-    case "create":
-      Page = Create;
-      break;
-    case "status":
-      Page = Status;
-      break;
-    default:
-      location.replace("/status/404");
+  const f7Params = {
+    id: "net.sueqk.pastabin",
+    theme: "ios",
+    autoDarkTheme: true,
+    routes,
+    popup: {
+      closeOnEscape: true,
+    },
+    sheet: {
+      closeOnEscape: true,
+    },
+    popover: {
+      closeOnEscape: true,
+    },
+    actions: {
+      closeOnEscape: true,
+    },
+  };
+
+  function mainInit(view) {
+    let url = "";
+    setInterval(() => {
+      if (url === view.router.url) return;
+      url = view.router.url;
+      history.pushState({}, "", view.router.url);
+    }, 100);
   }
 </script>
 
 <svelte:head>
   <meta name="viewport" content="width=device-width" />
-  <style lang="scss">
-    @import "highlight.js/scss/github-dark.scss";
-    HouseFill {
-      font-size: 2em;
-    }
-  </style>
   <title>PastaBin</title>
 </svelte:head>
 
-<F7Page>
-<Navbar title="PastaBin">
-<HouseFill />
-</Navbar>
-
-<svelte:component this={Page} />
-</F7Page>
+<App {...f7Params}>
+  <Navbar>
+    <NavLeft>
+      <NavTitle>PastaBin</NavTitle>
+    </NavLeft>
+    <NavRight>
+      <Link href="/index.html" reloadCurrent iconF7="house_fill" iconSize="40px" />
+      <Link href="/create" reloadCurrent iconF7="plus" iconSize="40px" />
+      <Link href="https://github.com/Sueqkjs/pastabin" external iconF7="logo_github" iconSize="40px" />
+    </NavRight>
+  </Navbar>
+  <View main onViewInit={mainInit} />
+</App>

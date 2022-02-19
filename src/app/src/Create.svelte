@@ -1,93 +1,107 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { Page, List, BlockHeader, BlockTitle, ListInput, Button } from "framework7-svelte";
   import * as aes from "../../../lib/crypto";
+
   $: resultKey = "";
   $: resultNonce = "";
   $: resultId = "";
+  $: title = "";
+  $: content = "";
   let root;
   let _;
+  let isLoading = false;
 
   onMount(() => {
     _ = root.querySelector.bind(root);
+    setInterval(() => {
+      console.log(title, content)
+    }, 1500)
   });
-  const contentChange = () => {
-    const content = _(".wrapper #content");
-    let maxC = Math.max(...content.value.split("\n").map((x) => x.length));
-    let maxL = content.value.split("\n").length;
-    content.rows = maxL;
-    content.cols = maxC;
-  };
-  async function post() {
-    let title = _("#title");
-    let content = _(".wrapper #content");
-    let submit = _("#submit");
-    let wrapper = _(".wrapper");
-    let r = _("#result");
 
-    let { key, id, nonce } = await (
+  async function post() {
+    isLoading = true;
+    let r = _("#result");
+    let key = rand(32);
+    let nonce = rand(12);
+    content = content.replaceAll("<div>", "\n").replaceAll("</div>", "").replaceAll("&nbsp;", " ");
+
+    let { id } = await (
       await fetch("api/pasta", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: title.value,
-          content: content.value,
+          title,
+          content: aes.toHex(aes.encrypt(key, nonce, aes.toU8(content, true))),
           showPasswordHash: "",
         }),
       })
     )
       .json()
-      .catch(alert);
+      .catch((e) => {
+        isLoading = false;
+      });
     resultId = id;
-    resultKey = key;
-    resultNonce = nonce;
-    root.removeChild(title);
-    root.removeChild(wrapper);
-    root.removeChild(submit);
+    resultKey = aes.toHex(key);
+    resultNonce = aes.toHex(nonce);
     r.style.display = "block";
+  }
+
+  function rand(bit: number): Uint8Array {
+    return crypto.getRandomValues(new Uint8Array(bit));
   }
 </script>
 
-<main bind:this={root}>
-  <h1>Boil the pasta</h1>
-  <input id="title" placeholder="Title" /> <br />
-  <div class="wrapper">
-    <textarea on:input={contentChange} id="content" placeholder="Content" />
-    <br />
+<Page>
+  <div bind:this={root}>
+    <BlockTitle>Boil the pasta</BlockTitle>
+    <BlockHeader>Warning: Title value was not encrypted</BlockHeader>
+    <List>
+      <ListInput
+        type="texteditor"
+        label="Title"
+        resizable
+        placeholder="ex: very very secret source code"
+        textEditorParams={{
+          el: "",
+          mode: "popver"
+        }}
+        onTextEditorChange={(v) => title = v}
+      />
+      <ListInput
+        type="texteditor"
+        label="Content"
+        placeholder="Enter text...."
+        resizable
+        textEditorParams={{
+          el: "",
+          mode: "popover"
+        }}
+        onTextEditorChange={(v) => content = v}
+      />
+      <Button fill preloader loading={isLoading} onClick={post}>Boil</Button>
+    </List>
+    <div id="result">
+      <p>Id:</p>
+      <input readonly class="result" value={resultId} />
+      <p>Key:</p>
+      <input readonly class="result" value={resultKey} />
+      <p>Nonce:</p>
+      <input readonly class="result" value={resultNonce} />
+      <p>Url(UnSecure):</p>
+      <input
+        readonly
+        class="result"
+        value="{location.origin}/pasta/{resultId}?iv={resultNonce}&k={resultKey}"
+      />
+    </div>
   </div>
-  <input id="submit" on:click={post} type="button" value="Boil" />
-  <div id="result">
-    <p>Id:</p>
-    <input readonly class="result" value={resultId} />
-    <p>Key:</p>
-    <input readonly class="result" value={resultKey} />
-    <p>Nonce:</p>
-    <input readonly class="result" value={resultNonce} />
-    <p>Url(UnSecure):</p>
-    <input
-      readonly
-      class="result"
-      value="{location.origin}/pasta/{resultId}?iv={resultNonce}&k={resultKey}"
-    />
-  </div>
-</main>
+</Page>
 
 <style lang="scss">
   #result {
     display: none;
-  }
-  input,
-  textarea {
-    color: white;
-    background: #222;
-    border-radius: 4px;
-    border: 2px solid #333;
-  }
-  .wrapper {
-    width: 80%;
-    #content {
-      width: 100%;
-    }
   }
 </style>

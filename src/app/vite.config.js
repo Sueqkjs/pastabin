@@ -1,15 +1,15 @@
 import { defineConfig } from "vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte"
-import preprocess from "svelte-preprocess"
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import preprocess from "svelte-preprocess";
 
 export default defineConfig({
   plugins: [
     svelte({
       preprocess: preprocess({
         sourceMap: true,
-        preserve: [ "module" ]
-      })
-    })
+        preserve: ["module"],
+      }),
+    }),
   ],
   build: {
     /*rollupOptions: {
@@ -18,5 +18,5 @@ export default defineConfig({
     target: ["esnext"],
     sourcemap: true,
     outDir: "../../static",
-  }
-}) 
+  },
+});

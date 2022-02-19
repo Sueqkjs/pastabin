@@ -18,6 +18,6 @@ export function toHex(s: Uint8Array) {
   return Buffer.from(s).toString("hex");
 }
 
-export function toU8(s: string) {
-  return Uint8Array.from(Buffer.from(s, "hex"));
+export function toU8(s: string, utf?: boolean) {
+  return Uint8Array.from(Buffer.from(s, utf ? "utf-8" : "hex"));
 }

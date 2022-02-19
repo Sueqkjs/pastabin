@@ -1,37 +1,35 @@
 <script lang="ts">
   import * as aes from "../../../lib/crypto/index";
   import hljs from "highlight.js";
+  import { Page, Block, BlockTitle, BlockHeader, List, ListInput, Button } from "framework7-svelte";
   import { onMount } from "svelte";
 
-  let root;
+  const params = new URLSearchParams(location.search.slice(1));
+  $: key = escapeHTML(params.get("k"));
+  $: nonce = escapeHTML(params.get("iv"));
   $: content = "Loading...";
   $: title = "Loading...";
   $: uploadedTimestamp = 0;
+
   onMount(async () => {
-    const params = new URLSearchParams(location.search.slice(1));
-    const key = params.get("k");
-    const nonce = params.get("iv");
     const id = location.pathname.slice(1).split("/")[1];
     const res = await (await fetch("/api/pasta/" + id)).json().catch(alert);
     if (!res) return alert("Something went wrong. " + res?.message ?? "");
-    content = escapeHTML(res.content);
+    content = res.content;
     title = escapeHTML(res.title);
-    uploadedTimestamp = res.uploadedTimestamp;
+    uploadedTimestamp = res.uploaded_timestamp;
     if (key && nonce) {
-      root.querySelector("#key").value = escapeHTML(key);
-      root.querySelector("#nonce").value = escapeHTML(nonce);
       await decrypt();
     }
   });
 
   async function decrypt() {
-    const key = aes.toU8(root.querySelector("#key").value);
-    const nonce = aes.toU8(root.querySelector("#nonce").value);
-
-    let highlighted = hljs.highlightAuto(
-      unescapeHTML(aes.toPlain(aes.decrypt(key, nonce, aes.toU8(content))))
-    );
-    content = highlighted.value.replace("\n", "<br>");
+    const _key = aes.toU8(key);
+    const _nonce = aes.toU8(nonce);
+    content = hljs.highlightAuto(
+      unescapeHTML(aes.toPlain(aes.decrypt(_key, _nonce, aes.toU8(content))))
+    ).value.replaceAll("\n", "<br>");
+    console.log(content)
   }
 
   function unescapeHTML(html) {
@@ -61,34 +59,44 @@
   }
 </script>
 
-<main>
-  <h1>{title}</h1>
-  <div bind:this={root} id="pasta">
-    <input id="key" placeholder="Encrypt Key" /> <br />
-    <input id="nonce" placeholder="Encrypt nonce(iv)" /> <br />
-    <input on:click={decrypt} id="decrypt" type="button" value="Decrypt" />
-    <br /> <br />
-    <div id="code">{@html content}</div>
-  </div>
-</main>
-
-<style lang="scss">
-  input,
-  #code {
-    color: white;
-    background: #222;
-    border: 2px solid #333;
-    border-radius: 4px;
-  }
-  #pasta {
-    width: 80%;
-    #code {
-      background: #111;
-      font-weight: lighter;
-      font-family: "Courier New", Courier, monospace;
-      width: 100%;
-      overflow: scroll;
-      white-space: pre-wrap;
-    }
-  }
-</style>
+<Page>
+  <BlockTitle>{title}</BlockTitle>
+  <BlockHeader>Uploaded At: {
+    new Intl.DateTimeFormat("en-US", { 
+      dateStyle: "full", 
+      timeStyle: "long"
+    }).format(uploadedTimestamp)}</BlockHeader>
+  <List>
+    <ListInput
+      type="texteditor"
+      label="Key"
+      placeholder="Decrypt Key"
+      resizable
+      textEditorParams={{
+        mode: "popover",
+        el: ""
+      }}
+      value={key}
+      onTextEditorChange={(value) => key = value}
+    />
+    <ListInput
+      type="texteditor"
+      label="Nonce"
+      placeholder="Decrypt Nonce"
+      resizable
+      textEditorParams={{
+        mode: "popover",
+        el: ""
+      }}
+      value={nonce}
+      onTextEditorChange={(value) => nonce = value}
+    />
+    <Button fill preloader onClick={decrypt}>Boil</Button>
+  </List>
+  <BlockTitle>
+    Content
+  </BlockTitle>
+  <Block inset id="content"><pre>{@html content}</pre></Block>
+  <br>
+  <br>
+</Page>

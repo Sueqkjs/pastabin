@@ -19,9 +19,10 @@
   "dependencies": {
     "@luncheon/esbuild-plugin-gzip": "^0.1.0",
     "@sveltejs/vite-plugin-svelte": "1.0.0-next.37",
-    "framework7": "next",
+    "@tsconfig/svelte": "^3.0.0",
+    "framework7": "^6.3.16",
     "framework7-icons": "^5.0.5",
-    "framework7-svelte": "next",
+    "framework7-svelte": "^6.3.16",
     "highlight.js": "^11.4.0",
     "sass": "^1.49.0",
     "statuses": "^2.0.1",

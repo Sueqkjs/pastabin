@@ -1,6 +1,10 @@
-<main>
+<script lang="ts">
+  import { Page } from "framework7-svelte";
+</script>
+
+<Page class="page-home">
   <h1>PastaBin</h1>
-</main>
+</Page>
 
 <style lang="scss">
   $textColor: white;
@@ -10,11 +14,9 @@
     color: $textColor;
     background: $backgroundColor;
   }
-  main {
-    h1 {
-      text-align: center;
-      padding: 1em;
-      margin: 0 auto;
-    }
+  h1 {
+    text-align: center;
+    padding: 1em;
+    margin: 0 auto;
   }
 </style>
