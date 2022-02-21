@@ -15,7 +15,6 @@
   const f7Params = {
     id: "net.sueqk.pastabin",
     theme: "ios",
-    autoDarkTheme: true,
     routes,
     popup: {
       closeOnEscape: true,
