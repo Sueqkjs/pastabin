@@ -14,8 +14,8 @@
   import { onMount } from "svelte";
 
   const params = new URLSearchParams(location.search.slice(1));
-  $: key = escapeHTML(params.get("k"));
-  $: nonce = escapeHTML(params.get("iv"));
+  $: key = params.get("k");
+  $: nonce = params.get("iv");
   $: content = "Loading...";
   $: title = "Loading...";
   $: uploadedTimestamp = 0;
@@ -69,7 +69,7 @@
     });
   }
 
-  function unescapeHTML(html) {
+  function unescapeHTML(html: string) {
     return html.replace(/&(amp|#x27|#x60|quot|lt|gt);/g, (str) => {
       return {
         "&amp;": "&",
@@ -82,7 +82,7 @@
     });
   }
 
-  function escapeHTML(html) {
+  function escapeHTML(html: string) {
     return html.replace(/[&'`"<>]/g, (str) => {
       return {
         "&": "&amp;",
@@ -100,6 +100,7 @@
   <BlockTitle>{title}</BlockTitle>
   <BlockHeader
     >Uploaded At: {new Intl.DateTimeFormat("en-US", {
+      // @ts-ignore
       dateStyle: "full",
       timeStyle: "long",
     }).format(uploadedTimestamp)}</BlockHeader

@@ -7,15 +7,12 @@
     NavRight,
     NavLeft,
     NavTitle,
-    Icon,
-    RouterContextProvider,
   } from "framework7-svelte";
   import routes from "./routes";
 
   const f7Params = {
     id: "net.sueqk.pastabin",
     theme: "ios",
-    autoDarkTheme: true,
     routes,
     popup: {
       closeOnEscape: true,

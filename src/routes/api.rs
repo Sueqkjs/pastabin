@@ -43,14 +43,25 @@ pub struct PasswordCheckResponse {
   passworded: bool,
 }
 
+impl Pasta {
+  pub fn default() -> Self {
+    Self {
+      id: "".into(),
+      title: "".into(),
+      content: "".into(),
+      uploaded_timestamp: 0,
+      show_password_hash: "".into(),
+    }
+  }
+}
+
 #[post("/api/pasta")]
 pub async fn create_post(
   data: web::Json<UserPostedPasta>,
   db: web::Data<Addr<RedisActor>>,
 ) -> Result<HttpResponse, AWError> {
   let id = hex::encode(crypto::rand(16));
-  let dt: DateTime<Utc> = Utc::now();
-  let uploaded_timestamp = dt.timestamp_millis();
+  let uploaded_timestamp = (Utc::now() as DateTime<Utc>).timestamp_millis();
 
   db.send(Command(resp_array![
     "HMSET",
@@ -78,7 +89,7 @@ pub async fn get_pasta(
   match db
     .send(Command(resp_array![
       "HMGET",
-      id.clone(),
+      &id,
       "title",
       "content",
       "show_password_hash",
@@ -94,10 +105,10 @@ pub async fn get_pasta(
           _ => "".to_string(),
         })
         .collect::<Vec<String>>();
-      let title = resp[0].clone();
-      let content = resp[1].clone();
-      let show_password_hash = resp[2].clone();
-      let uploaded_timestamp = resp[3].clone().parse::<i64>().unwrap();
+      let title = &resp[0];
+      let content = &resp[1];
+      let show_password_hash = &resp[2];
+      let uploaded_timestamp = &resp[3].parse::<i64>().unwrap();
       let mut hasher = Sha512::new();
       hasher.update(&data.show_password);
       let requested_show_password_hash = hasher.finalize();
@@ -107,19 +118,13 @@ pub async fn get_pasta(
       if show_password_hash.len() == 0 || hash_ok {
         Ok(HttpResponse::Ok().json(Pasta {
           id,
-          title,
-          content,
-          uploaded_timestamp,
-          show_password_hash,
+          title: title.into(),
+          content: content.into(),
+          uploaded_timestamp: *uploaded_timestamp,
+          show_password_hash: show_password_hash.into(),
         }))
       } else {
-        Ok(HttpResponse::Forbidden().json(Pasta {
-          id: "".into(),
-          title: "".into(),
-          content: "".into(),
-          uploaded_timestamp: 0,
-          show_password_hash: "".into(),
-        }))
+        Ok(HttpResponse::Forbidden().json(Pasta::default()))
       }
     }
     _ => Ok(HttpResponse::Ok().body("")),
@@ -135,7 +140,7 @@ pub async fn password_check(
   match db
     .send(Command(resp_array![
       "HMGET",
-      id.clone(),
+      &id,
       "show_password_hash"
     ]))
     .await??
