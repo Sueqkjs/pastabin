@@ -2,10 +2,6 @@ use actix_files::NamedFile;
 use actix_web::{get, HttpRequest, HttpResponse, Responder};
 use std::fs;
 
-/*#[get("/index.html")]
-#[get("/create")]
-#[get("/pasta/{id}")]
-#[get("/status/{code}")]*/
 pub async fn app_page() -> impl Responder {
   HttpResponse::Ok().body(fs::read_to_string("./static/index.html").unwrap())
 }
