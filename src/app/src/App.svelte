@@ -7,8 +7,6 @@
     NavRight,
     NavLeft,
     NavTitle,
-    Icon,
-    RouterContextProvider,
   } from "framework7-svelte";
   import routes from "./routes";
 

@@ -34,7 +34,7 @@
       async (v: string) => {
         showPassword = v;
         if (showPassword.trim().length === 0)
-          return f7.dialog.alert("Please Enter Password.");
+          f7.dialog.alert("Warning: empty password");
         isLoading = true;
         let result = _("#result");
         let input = _("#input");
