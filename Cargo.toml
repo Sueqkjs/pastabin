@@ -19,6 +19,7 @@ hex = "0.4.3"
 chrono = "0.4.19"
 env_logger = "*"
 sha2 = "0.10.2"
+derive_more = "0.99.17"
 
 [dependencies.tokio]
 version = "1.16.1"

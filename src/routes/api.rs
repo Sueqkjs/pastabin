@@ -1,11 +1,12 @@
 use actix::prelude::*;
 use actix_redis::{Command, RedisActor};
-use actix_web::{get, post, web, Error as AWError, HttpRequest, HttpResponse, Result};
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Result};
 use chrono::{DateTime, Utc};
 use hex;
 use redis_async::{resp::RespValue, resp_array};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
+use crate::errors::Error;
 extern crate crypto;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -59,7 +60,7 @@ impl Pasta {
 pub async fn create_post(
   data: web::Json<UserPostedPasta>,
   db: web::Data<Addr<RedisActor>>,
-) -> Result<HttpResponse, AWError> {
+) -> Result<HttpResponse, Error> {
   let id = hex::encode(crypto::rand(16));
   let uploaded_timestamp = (Utc::now() as DateTime<Utc>).timestamp_millis();
 
@@ -84,7 +85,7 @@ pub async fn get_pasta(
   req: HttpRequest,
   data: web::Json<PastaRequest>,
   db: web::Data<Addr<RedisActor>>,
-) -> Result<HttpResponse, AWError> {
+) -> Result<HttpResponse, Error> {
   let id = req.match_info().query("id").parse::<String>()?;
   match db
     .send(Command(resp_array![
@@ -101,19 +102,18 @@ pub async fn get_pasta(
       let resp = pasta
         .iter()
         .map(|x| match x {
-          RespValue::BulkString(y) => String::from_utf8(y.to_vec()).unwrap(),
+          RespValue::BulkString(y) => String::from_utf8_lossy(&y.to_vec()).into(),
           _ => "".to_string(),
         })
         .collect::<Vec<String>>();
       let title = &resp[0];
       let content = &resp[1];
       let show_password_hash = &resp[2];
-      let uploaded_timestamp = &resp[3].parse::<i64>().unwrap();
+      let uploaded_timestamp = &resp[3].parse::<i64>()?;
       let mut hasher = Sha512::new();
       hasher.update(&data.show_password);
       let requested_show_password_hash = hasher.finalize();
-      let hash_ok = hex::decode(&show_password_hash)
-        .unwrap()
+      let hash_ok = hex::decode(&show_password_hash)?
         .eq(&requested_show_password_hash.to_vec());
       if show_password_hash.len() == 0 || hash_ok {
         Ok(HttpResponse::Ok().json(Pasta {
@@ -135,7 +135,7 @@ pub async fn get_pasta(
 pub async fn password_check(
   req: HttpRequest,
   db: web::Data<Addr<RedisActor>>,
-) -> Result<HttpResponse, AWError> {
+) -> Result<HttpResponse, Error> {
   let id = req.match_info().query("id").parse::<String>()?;
   match db
     .send(Command(resp_array![
@@ -149,7 +149,7 @@ pub async fn password_check(
       let resp = pasta
         .iter()
         .map(|x| match x {
-          RespValue::BulkString(y) => String::from_utf8(y.to_vec()).unwrap(),
+          RespValue::BulkString(y) => String::from_utf8_lossy(&y.to_vec()).into(),
           _ => "".to_string(),
         })
         .collect::<Vec<String>>();

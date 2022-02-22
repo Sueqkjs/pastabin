@@ -1498,6 +1498,7 @@ dependencies = [
  "actix-web",
  "chrono",
  "crypto",
+ "derive_more",
  "dotenv",
  "env_logger",
  "hex",

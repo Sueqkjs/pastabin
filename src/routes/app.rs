@@ -1,9 +1,10 @@
 use actix_files::NamedFile;
 use actix_web::{get, HttpRequest, HttpResponse, Responder};
 use std::fs;
+use crate::errors::Error;
 
-pub async fn app_page() -> impl Responder {
-  HttpResponse::Ok().body(fs::read_to_string("./static/index.html").unwrap())
+pub async fn app_page() -> Result<HttpResponse, Error> {
+  Ok(HttpResponse::Ok().body(fs::read_to_string("./static/index.html")?))
 }
 
 #[get("/")]

@@ -6,6 +6,7 @@ use actix_web::{
   web, App, HttpServer,
 };
 use dotenv::dotenv;
+pub mod errors;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
