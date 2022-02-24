@@ -11,6 +11,7 @@
     Button,
     f7,
   } from "framework7-svelte";
+  import { passwordAsync, rand } from "./utils";
   import * as aes from "../../../lib/crypto";
 
   $: resultKey = "";
@@ -35,7 +36,7 @@
           () => ""
         );
     if (showPassword.trim().length === 0)
-      f7.dialog.alert("Warning: empty password");
+      f7.dialog.alert("Warning: empty password", "PastaBin");
     isLoading = true;
     let result = _("#result");
     let input = _("#input");
@@ -78,14 +79,6 @@
     input.style.display = "none";
   }
 
-  function rand(bit: number): Uint8Array {
-    return crypto.getRandomValues(new Uint8Array(bit));
-  }
-  function passwordAsync(title: string, text: string): Promise<string> {
-    return new Promise((res, rej) => {
-      f7.dialog.password(title, text, res, rej);
-    });
-  }
 </script>
 
 <Page>

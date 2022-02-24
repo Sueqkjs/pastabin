@@ -9,8 +9,8 @@
     List,
     ListInput,
     Button,
-    f7,
   } from "framework7-svelte";
+  import { passwordAsync, unescapeHTML, escapeHTML } from "./utils";
   import { onMount } from "svelte";
 
   const params = new URLSearchParams(location.search.slice(1));
@@ -61,38 +61,6 @@
         unescapeHTML(aes.toPlain(aes.decrypt(_key, _nonce, aes.toU8(content))))
       )
       .value.replaceAll("\n", "<br>");
-  }
-
-  function passwordAsync(title: string, text: string): Promise<string> {
-    return new Promise((res, rej) => {
-      f7.dialog.password(title, text, res, rej);
-    });
-  }
-
-  function unescapeHTML(html: string) {
-    return html.replace(/&(amp|#x27|#x60|quot|lt|gt);/g, (str) => {
-      return {
-        "&amp;": "&",
-        "&#x27;": "'",
-        "&#x60;": "`",
-        "&quot;": '"',
-        "&lt;": "<",
-        "&gt;": ">",
-      }[str];
-    });
-  }
-
-  function escapeHTML(html: string) {
-    return html.replace(/[&'`"<>]/g, (str) => {
-      return {
-        "&": "&amp;",
-        "'": "&#x27;",
-        "`": "&#x60;",
-        '"': "&quot;",
-        "<": "&lt;",
-        ">": "&gt;",
-      }[str];
-    });
   }
 </script>
 

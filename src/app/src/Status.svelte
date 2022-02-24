@@ -2,7 +2,7 @@
   import statuses from "statuses";
   import { BlockTitle, BlockHeader, Block, Page } from "framework7-svelte";
   const code = location.pathname.slice(1).split("/").pop();
-  const message = "Status: " + statuses.message[code];
+  const message = "Status: " + statuses(code);
 </script>
 
 <Page>
