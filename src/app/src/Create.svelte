@@ -11,7 +11,7 @@
     Button,
     f7,
   } from "framework7-svelte";
-  import { passwordAsync, rand } from "./utils";
+  import { passwordAsync, rand, alert } from "./utils";
   import * as aes from "../../../lib/crypto";
 
   $: resultKey = "";
@@ -32,11 +32,11 @@
   async function post() {
     let showPassword = noPassword
       ? ""
-      : await passwordAsync("This Pasta's password", "PastaBin").catch(
+      : await passwordAsync("This Pasta's password").catch(
           () => ""
         );
     if (showPassword.trim().length === 0)
-      f7.dialog.alert("Warning: empty password", "PastaBin");
+      alert("Warning: empty password");
     isLoading = true;
     let result = _("#result");
     let input = _("#input");

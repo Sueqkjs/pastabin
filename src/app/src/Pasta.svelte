@@ -10,7 +10,7 @@
     ListInput,
     Button,
   } from "framework7-svelte";
-  import { passwordAsync, unescapeHTML, escapeHTML } from "./utils";
+  import { passwordAsync, unescapeHTML, escapeHTML, alert } from "./utils";
   import { onMount } from "svelte";
 
   const params = new URLSearchParams(location.search.slice(1));
@@ -27,7 +27,7 @@
       await (await fetch("/api/pasta/" + id)).json().catch(alert)
     )?.passworded;
     if (passworded)
-      password = await passwordAsync("This Pasta's password", "PastaBin").catch(
+      password = await passwordAsync("This Pasta's password").catch(
         (x) => ""
       );
     const res = await (

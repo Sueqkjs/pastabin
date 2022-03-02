@@ -1,9 +1,14 @@
 import { f7 } from "framework7-svelte";
 
-export function passwordAsync(title: string, text: string): Promise<string> {
+export function passwordAsync(text: string): Promise<string> {
   return new Promise((res, rej) => {
-    f7.dialog.password(title, text, res, rej);
+    f7.dialog.password("PastaBin", text, res, rej);
   });
+}
+
+export function alert(text: any) {
+  if (typeof text !== "string") text = text+"";
+  f7.dialog.alert(text, "PastaBin");
 }
 
 export function rand(bit: number): Uint8Array {
